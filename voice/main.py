@@ -47,6 +47,12 @@ async def _main_loop() -> int:
 
 def main() -> int:
     """Entry referenced by `[project.scripts] voice = voice.main:main`."""
+    # Wire signal + atexit cleanup before doing anything else, so any
+    # subprocess we spawn (llama-cpp server, moshi-mlx) dies with us no
+    # matter how the parent exits — Ctrl-C, SIGTERM, SIGHUP, normal exit.
+    from voice.process_registry import install_handlers
+    install_handlers()
+
     args = sys.argv[1:]
     if args and args[0] == "doctor":
         from voice.doctor import run_doctor
@@ -54,12 +60,16 @@ def main() -> int:
     if args and args[0] == "download":
         from voice.download import main_cli
         return main_cli()
+    if args and args[0] == "kill":
+        from voice.kill_strays import run_kill
+        return run_kill()
     if args and args[0] in {"-h", "--help"}:
         console.print(
             "[primary]voice[/primary]                          launch the demo TUI\n"
             "[primary]voice doctor[/primary]                   pre-flight check (audio, keys, models)\n"
             "[primary]voice download [target...][/primary]     pre-fetch model weights\n"
             "[muted]                                  targets: llama, whisper, kokoro, moshi, all (default)[/muted]\n"
+            "[primary]voice kill[/primary]                     reap stray child processes from a previous run\n"
         )
         return 0
 

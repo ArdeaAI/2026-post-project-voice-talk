@@ -15,6 +15,8 @@ from typing import AsyncIterator
 
 import httpx
 
+from voice.process_registry import register, unregister
+
 
 @asynccontextmanager
 async def llama_server(
@@ -48,7 +50,9 @@ async def llama_server(
         *argv,
         stdout=asyncio.subprocess.DEVNULL,
         stderr=asyncio.subprocess.DEVNULL,
+        start_new_session=True,  # own process group so killpg() reaps the tree
     )
+    register(proc)
 
     base_url = f"http://127.0.0.1:{port}/v1"
 
@@ -89,3 +93,4 @@ async def llama_server(
                 except ProcessLookupError:
                     pass
                 await proc.wait()
+        unregister(proc)

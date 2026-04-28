@@ -88,37 +88,62 @@ def run_download(targets: list[str] | None = None) -> int:
     if "kokoro" in selected:
         _step("Kokoro 82M TTS (~300MB) — Demo 1 TTS")
         try:
-            # kokoro-onnx auto-downloads its model + voices on first init.
-            from kokoro_onnx import Kokoro  # type: ignore
-            t0 = time.monotonic()
-            # Kokoro() with no args uses bundled defaults and downloads from HF.
-            try:
-                _kokoro = Kokoro.from_pretrained()  # type: ignore[attr-defined]
-            except (AttributeError, TypeError):
-                # Older kokoro_onnx API — instantiate directly
-                _kokoro = Kokoro(model_path=None, voices_path=None)  # type: ignore
-            _ok(f"loaded (cached) in {_human_seconds(t0)}")
-        except Exception as exc:
-            _fail(
-                f"{exc} — Kokoro auto-download path varies by version. "
-                "Will fall back to demo-launch download."
+            # Reuse Pipecat's own auto-download path so we land files in
+            # exactly the cache dir Pipecat's KokoroTTSService will read from
+            # at demo launch — same files, same locations, full idempotency.
+            from pipecat.services.kokoro.tts import (
+                KOKORO_CACHE_DIR,
+                _ensure_model_files,
             )
-            # Don't count this as a hard failure; Pipecat's KokoroTTSService
-            # will trigger the download on first synth instead.
+            from pathlib import Path
+
+            t0 = time.monotonic()
+            model_file = Path(KOKORO_CACHE_DIR) / "kokoro-v1.0.onnx"
+            voices_file = Path(KOKORO_CACHE_DIR) / "voices-v1.0.bin"
+            had_model = model_file.exists()
+            had_voices = voices_file.exists()
+            _ensure_model_files(model_file, voices_file)
+            if had_model and had_voices:
+                _ok(f"already cached at {KOKORO_CACHE_DIR}")
+            else:
+                _ok(f"downloaded to {KOKORO_CACHE_DIR} in {_human_seconds(t0)}")
+        except Exception as exc:
+            _fail(f"{exc}")
+            failures += 1
 
     # ── Moshi MLX int8 ───────────────────────────────────────────
     if "moshi" in selected:
         _step("Moshi MLX int8 (~8GB) — Demo 2")
         try:
             from huggingface_hub import snapshot_download
-            t0 = time.monotonic()
-            # moshi-mlx pulls from kyutai/moshiko-mlx-q8 on first launch.
-            # Pre-fetching the snapshot is the cleanest pre-warm.
-            path = snapshot_download(
-                repo_id="kyutai/moshiko-mlx-q8",
-                token=settings.HF_TOKEN,
+            from huggingface_hub.errors import LocalEntryNotFoundError
+            from huggingface_hub.utils import (
+                disable_progress_bars,
+                enable_progress_bars,
             )
-            _ok(f"snapshot at {path} in {_human_seconds(t0)}")
+
+            repo_id = "kyutai/moshiko-mlx-q8"
+
+            # Cache-check first with the progress bar muted, so an idempotent
+            # re-run doesn't render a 0.0s "Fetching 5 files" bar when there's
+            # nothing to fetch. Only the real download (below) shows progress.
+            disable_progress_bars()
+            try:
+                cached_path = snapshot_download(
+                    repo_id=repo_id,
+                    local_files_only=True,
+                    token=settings.HF_TOKEN,
+                )
+                enable_progress_bars()
+                _ok(f"already cached at {cached_path}")
+            except (LocalEntryNotFoundError, OSError):
+                enable_progress_bars()
+                t0 = time.monotonic()
+                cached_path = snapshot_download(
+                    repo_id=repo_id,
+                    token=settings.HF_TOKEN,
+                )
+                _ok(f"downloaded to {cached_path} in {_human_seconds(t0)}")
         except Exception as exc:
             _fail(f"{exc}")
             failures += 1

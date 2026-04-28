@@ -16,6 +16,7 @@ import asyncio
 import sys
 
 from voice.menu import run_demo_with_ui, show_panel_until_escape
+from voice.process_registry import register, unregister
 from voice.settings import Settings
 
 
@@ -55,7 +56,9 @@ async def _run_moshi_subprocess(settings: Settings, ui) -> None:  # type: ignore
             *argv,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
+            start_new_session=True,  # own process group for clean teardown
         )
+        register(proc)
     except FileNotFoundError as e:
         ui.set_lines(
             [
@@ -127,6 +130,7 @@ async def _run_moshi_subprocess(settings: Settings, ui) -> None:  # type: ignore
                 except ProcessLookupError:
                     pass
                 await proc.wait()
+        unregister(proc)
         for t in (pump_task, proc_task):
             if not t.done():
                 t.cancel()

@@ -10,7 +10,18 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
-from voice import audio, console, doctor, llama_server, main, menu, models, settings
+from voice import (
+    audio,
+    console,
+    doctor,
+    kill_strays,
+    llama_server,
+    main,
+    menu,
+    models,
+    process_registry,
+    settings,
+)
 from voice.demos import api_comparison, hume_emotion, local_pipeline, moshi_e2e
 
 
@@ -118,3 +129,68 @@ def test_demo_hume_gates_on_both_keys() -> None:
     assert not s.has_hume
     s = settings.Settings(HUME_API_KEY="a", HUME_SECRET_KEY="b")
     assert s.has_hume
+
+
+def test_process_registry_kills_subprocess() -> None:
+    """Spawn a long-running sleep, register it, kill_all should reap it."""
+    import asyncio
+    import os as _os
+
+    async def _spawn_and_reap():  # type: ignore[no-untyped-def]
+        proc = await asyncio.create_subprocess_exec(
+            "sleep",
+            "300",
+            stdout=asyncio.subprocess.DEVNULL,
+            stderr=asyncio.subprocess.DEVNULL,
+            start_new_session=True,
+        )
+        process_registry.register(proc)
+        pid = proc.pid
+        assert proc.returncode is None
+        process_registry.kill_all(grace_seconds=0.3)
+        for _ in range(20):
+            if proc.returncode is not None:
+                break
+            await asyncio.sleep(0.1)
+        process_registry.unregister(proc)
+        return pid, proc.returncode
+
+    pid, returncode = asyncio.run(_spawn_and_reap())
+
+    assert returncode is not None, "subprocess still running after kill_all"
+
+    raised = False
+    try:
+        _os.kill(pid, 0)
+    except ProcessLookupError:
+        raised = True
+    except PermissionError:
+        raised = True
+    assert raised, f"pid {pid} still exists after kill_all"
+
+
+def test_process_registry_install_handlers_idempotent() -> None:
+    process_registry.install_handlers()
+    process_registry.install_handlers()
+    assert True
+
+
+def test_process_registry_register_unregister_count() -> None:
+    class _FakeProc:
+        def __init__(self, pid: int) -> None:
+            self.pid = pid
+            self.returncode = None
+
+    p1 = _FakeProc(99991)
+    p2 = _FakeProc(99992)
+    before = process_registry.registered_count()
+    process_registry.register(p1)  # type: ignore[arg-type]
+    process_registry.register(p2)  # type: ignore[arg-type]
+    assert process_registry.registered_count() == before + 2
+    process_registry.unregister(p1)  # type: ignore[arg-type]
+    process_registry.unregister(p2)  # type: ignore[arg-type]
+    assert process_registry.registered_count() == before
+
+
+def test_kill_strays_module_exposes_run() -> None:
+    assert callable(kill_strays.run_kill)
