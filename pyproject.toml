@@ -10,6 +10,12 @@ dependencies = [
     "matplotlib>=3.10.9",
     "plotly>=6.7.0",
     "rich>=15.0.0",
+    "pydantic>=2.10",
+    "pydantic-settings>=2.7",
+    "prompt-toolkit>=3.0.50",
+    "sounddevice>=0.5",
+    "numpy>=2.1",
+    "huggingface-hub>=0.27",
 ]
 
 [project.scripts]
