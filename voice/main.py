@@ -51,10 +51,15 @@ def main() -> int:
     if args and args[0] == "doctor":
         from voice.doctor import run_doctor
         return run_doctor()
+    if args and args[0] == "download":
+        from voice.download import main_cli
+        return main_cli()
     if args and args[0] in {"-h", "--help"}:
         console.print(
-            "[primary]voice[/primary]          launch the demo TUI\n"
-            "[primary]voice doctor[/primary]   pre-flight check (audio, keys, models)\n"
+            "[primary]voice[/primary]                          launch the demo TUI\n"
+            "[primary]voice doctor[/primary]                   pre-flight check (audio, keys, models)\n"
+            "[primary]voice download [target...][/primary]     pre-fetch model weights\n"
+            "[muted]                                  targets: llama, whisper, kokoro, moshi, all (default)[/muted]\n"
         )
         return 0
 

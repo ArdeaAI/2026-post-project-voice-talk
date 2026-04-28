@@ -51,12 +51,22 @@ Four demos:
 
 | # | Demo | What it does |
 |---|---|---|
-| 1 | **Local pipeline** | [Pipecat](https://github.com/pipecat-ai/pipecat) orchestrating [Moonshine v2](https://github.com/moonshine-ai/moonshine) STT + [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M) TTS + a small local LLM. All Apache 2.0 / permissive, all on your laptop, no cloud. |
+| 1 | **Local pipeline** | [Pipecat](https://github.com/pipecat-ai/pipecat) orchestrating [faster-whisper](https://github.com/SYSTRAN/faster-whisper) STT + [llama-cpp-python](https://github.com/abetlen/llama-cpp-python) (Llama 3.2 3B Q4_K_M) + [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M) TTS. Permissive / Apache 2.0 top to bottom, runs on your laptop, no cloud calls. *(Moonshine v2 is the eventual STT target — Whisper is the working default until a Moonshine Pipecat service lands.)* |
 | 2 | **Moshi (end-to-end)** | [Kyutai Moshi](https://github.com/kyutai-labs/moshi) — speech-native model that skips the STT+LLM+TTS pipeline. The "this is the future" demo. |
-| 3 | **API comparison** | Same prompt through OpenAI Realtime API vs. the local pipeline. Hear the latency and quality side-by-side. Needs `OPENAI_API_KEY`. |
-| 4 | **Emotion demo** | [Hume EVI 3](https://www.hume.ai) showing explicit emotion control. Needs `HUME_API_KEY`. |
+| 3 | **API comparison** | OpenAI Realtime API conversation. A/B with Demo 1 to hear the latency and quality difference. Needs `OPENAI_API_KEY`. |
+| 4 | **Emotion demo** | [Hume EVI 3](https://www.hume.ai) with live emotion-vector readout. Needs `HUME_API_KEY` + `HUME_SECRET_KEY`. |
 
-> The CLI is being built out alongside the slides. If a demo says "not implemented yet," the speaker hasn't shipped it. Pull again before the talk.
+First-time launches download model weights (~2 GB GGUF for Demo 1, ~8 GB for Moshi). They cache to `~/.cache/voice-cli/` and `~/.cache/huggingface/`. Run `uv run voice doctor` to see what's already on disk.
+
+To pre-fetch everything before going on stage (and avoid mid-talk download surprises):
+
+```bash
+uv run voice download              # all four models, ~10.5 GB total
+uv run voice download llama        # just Demo 1's LLM (~2 GB)
+uv run voice download moshi        # just Demo 2's weights (~8 GB)
+```
+
+Targets: `llama`, `whisper`, `kokoro`, `moshi`, `all`.
 
 ### 3. View the slides locally (optional)
 

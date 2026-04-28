@@ -161,8 +161,8 @@ async def show_panel_until_escape(
 ) -> None:
     """Render a static panel and wait until the user presses Esc.
 
-    Used by demo stubs that aren't wired up yet. `body_lines` is a list of
-    (style_class, text) tuples — same vocabulary as PT_STYLE above.
+    Used by demos that just want to display a message and wait. `body_lines`
+    is a list of (style_class, text) tuples — same vocabulary as PT_STYLE.
     """
 
     def render() -> FormattedText:
@@ -191,6 +191,115 @@ async def show_panel_until_escape(
         mouse_support=False,
     )
     await app.run_async()
+
+
+class DemoUI:
+    """Mutable UI handle passed into a live demo coroutine.
+
+    The demo updates `set_lines()` / `append_line()` to display status; the
+    surrounding Application redraws automatically. The `stop` asyncio.Event
+    is set when the user presses Esc/q/Ctrl-C — demos should poll it (or use
+    `await stop.wait()`) for graceful cancellation alongside their own work.
+    """
+
+    def __init__(self, app: Application, lines: list[tuple[str, str]], stop: "asyncio.Event") -> None:
+        self._app = app
+        self._lines = lines
+        self.stop = stop
+
+    def set_lines(self, lines: list[tuple[str, str]]) -> None:
+        self._lines.clear()
+        self._lines.extend(lines)
+        self._invalidate()
+
+    def append_line(self, style: str, text: str, max_lines: int = 24) -> None:
+        self._lines.append((style, text))
+        # Rolling window so the panel doesn't grow off-screen
+        if len(self._lines) > max_lines:
+            del self._lines[: len(self._lines) - max_lines]
+        self._invalidate()
+
+    def _invalidate(self) -> None:
+        try:
+            self._app.invalidate()
+        except Exception:
+            # The app may have already exited; harmless during teardown.
+            pass
+
+
+async def run_demo_with_ui(
+    title: str,
+    demo_coro: Callable[[DemoUI], Awaitable[None]],
+    initial_lines: list[tuple[str, str]] | None = None,
+) -> None:
+    """Run a demo coroutine inside a live full-screen panel.
+
+    The demo gets a `DemoUI` handle to update status text. The user can press
+    Esc/q/Ctrl-C at any time to set `ui.stop` and tear the demo down. The
+    coroutine is cancelled if it doesn't complete on its own when the panel
+    exits — demos should treat asyncio.CancelledError as a clean exit.
+    """
+    import asyncio  # local import — keep module import-time cheap
+
+    stop = asyncio.Event()
+    lines: list[tuple[str, str]] = list(initial_lines or [])
+
+    def render() -> FormattedText:
+        out: list[tuple[str, str]] = []
+        out.append(("class:title", f"\n  {title}\n\n"))
+        for style_class, text in lines:
+            out.append((style_class, f"  {text}\n"))
+        out.append(("", "\n"))
+        out.append(("class:hint", "  Press Esc to return to the menu\n"))
+        return FormattedText(out)
+
+    kb = KeyBindings()
+
+    @kb.add("escape")
+    @kb.add("q")
+    @kb.add("c-c")
+    def _esc(event):
+        stop.set()
+        event.app.exit()
+
+    layout = Layout(HSplit([Window(FormattedTextControl(render))]))
+    app = Application(
+        layout=layout,
+        key_bindings=kb,
+        style=PT_STYLE,
+        full_screen=True,
+        mouse_support=False,
+    )
+
+    ui = DemoUI(app=app, lines=lines, stop=stop)
+
+    demo_task: asyncio.Task[None] = asyncio.create_task(demo_coro(ui))
+    app_task: asyncio.Task[None] = asyncio.create_task(app.run_async())  # type: ignore[arg-type]
+
+    try:
+        # Whichever finishes first ends the demo.
+        done, pending = await asyncio.wait(
+            {demo_task, app_task}, return_when=asyncio.FIRST_COMPLETED
+        )
+    finally:
+        stop.set()
+        # If the demo coroutine is still running, cancel it.
+        if not demo_task.done():
+            demo_task.cancel()
+            try:
+                await demo_task
+            except (asyncio.CancelledError, Exception):
+                pass
+        # If the application is still running (demo finished first), close it.
+        if not app_task.done():
+            try:
+                app.exit()
+            except Exception:
+                pass
+            try:
+                await app_task
+            except (asyncio.CancelledError, Exception):
+                pass
 
 
 def resolve_runner(runner_path: str) -> Callable[[Settings], Awaitable[None]]:
