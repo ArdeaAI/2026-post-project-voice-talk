@@ -1,14 +1,51 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. `CLAUDE.md` is a symlink to `AGENTS.md` — edit `AGENTS.md` and both stay in sync.
 
 # 2026 Post Project Voice Talk
 
 ## Overview
 
-This will be a Revealjs and Quarto presentation that will go over a meeting about the state of AI voice agents in 2026 for a Chattanooga AI Collective meeting after the 2026 Project Voice conference.
+This is a two-part project for a Chattanooga AI Collective meeting following the 2026 Project Voice conference:
 
-As well as the presentation, it will include a rich CLI tool in `./voice` that will run a few variations of voice agents to demo.
+1. **Presentation** — a Reveal.js + Quarto deck on the state of AI voice agents in 2026.
+2. **CLI demo** (`voice/`) — a Rich-based Python CLI that runs a few variations of voice agents live during the talk.
 
-We will use `uv` as our python run tool and keep the `pyproject.toml` in the repo root.
+Python is managed by `uv` with `pyproject.toml` at the repo root. TypeScript/JS is managed by Bun with `package.json` at the repo root. Both stacks coexist in a single repo because the deck (TS/Reveal.js) and the demo (Python/Rich) ship together.
 
+Reference: Quarto Reveal.js (https://quarto.org/docs/presentations/revealjs/), Reveal.js (https://revealjs.com/).
+
+The `ai/` dir is for planning notes and specs and is gitignored — don't put anything there that needs to ship.
+
+## Repo Layout
+
+- `voice/main.py` — entrypoint for the `voice` CLI script (registered as a `[project.scripts]` entry in `pyproject.toml`, so `uv run voice` works once installed).
+- (no Bun TypeScript entrypoint) — Bun's only role here is running `package.json` scripts (`bun start` / `bun run render` / `bun run publish`). If custom JS for the deck is ever needed, add a `slides.js` and reference it via `include-after-body` in `_quarto.yml` rather than coupling it to a `bun run` entry.
+- `pyproject.toml` — Python 3.12 project, hatchling build, ruff + pytest dev group. Wheel packages = `["voice"]` (no `__init__.py` by design — see global preferences).
+- `package.json` — Bun project, ESM, depends on `reveal.js`. Bun-types provide TS support.
+- `tsconfig.json` — strict mode, bundler resolution, `noUncheckedIndexedAccess`, JSX = react-jsx. Don't relax these.
+- `ai/` — gitignored scratch dir for plans/specs.
+
+## Commands
+
+Python (CLI demo):
+- `uv sync` — install/refresh the venv from `uv.lock`.
+- `uv run voice` — run the CLI (uses the `voice = "voice.main:main"` script entry).
+- `uv run python -m voice.main` — equivalent direct invocation.
+- `uv run pytest` — run tests (none exist yet; `pytest` + `pytest-asyncio` are in the dev group).
+- `uv run pytest path/to/test_file.py::test_name` — run a single test.
+- `uv run ruff check .` / `uv run ruff format .` — lint / format. Ruff line length is 120 (global default).
+
+TypeScript (presentation):
+- `bun install` — install JS deps.
+- `bun test` — run tests if any get added (use `bun:test`, not jest/vitest).
+- There's no TS entrypoint right now; Bun is used purely as the script runner for the slides commands below.
+
+Slides (Quarto + Reveal.js — `slides.qmd` at repo root):
+- `bun start` — live preview at `localhost:[port]` with hot reload (wraps `quarto preview slides.qmd`).
+- `bun run render` — produce `slides.html` + `slides_files/` for serving (wraps `quarto render`).
+- `bun run publish` — push to GitHub Pages via `quarto publish gh-pages` (one-time setup needed: a `gh-pages` branch and Pages enabled in repo settings).
+- `slides.html` and `slides_files/` are build artifacts — the deck source of truth is `slides.qmd` + `_quarto.yml` + `gruvbox.scss` + `references.bib`.
 
 ## TypeScript Side
 

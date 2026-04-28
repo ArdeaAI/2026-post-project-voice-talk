@@ -1,0 +1,287 @@
+---
+title: "The State of AI Voice Agents in 2026"
+subtitle: "Chattanooga AI Collective · Post Project Voice Recap"
+author: "John Gardner (Sinjhin)"
+date: today
+date-format: long
+---
+
+## Welcome {.unnumbered .center}
+
+::: {.r-fit-text}
+**The State of AI Voice Agents in 2026**
+:::
+
+[Chattanooga AI Collective · Post Project Voice Recap]{.muted}
+
+[John Gardner ([Sinjhin](https://github.com/Sinjhin))]{.muted}
+
+::: notes
+Welcome the room. 30-second framing: "We're going from no-code to libraries to a paper. By the end you'll know where you fit in the stack." Mention the repo is public (URL on the next slide).
+:::
+
+---
+
+## Agenda { #agenda }
+
+[less technical → more technical →]{.muted}
+
+::: {.incremental}
+1. Voice landscape: no-code → API → libraries
+2. Demo: Sesame AI phone app *(closed beta)*
+3. Demo: `voice/` CLI — public repo, clone along
+4. Paper: *Crossing the Uncanny Valley of Conversational Voice* (Sesame, Feb 2025)
+:::
+
+::: notes
+Cue the public-repo URL out loud here so latecomers can pull it before the demos:
+github.com/Sinjhin/2026-post-project-voice-talk
+
+Hit Enter once per item — they reveal as fragments. Let each one breathe for 2-3 seconds before clicking the next.
+:::
+
+# Voice Landscape {.section-title background-color="#3c3836"}
+
+## The ladder of abstraction
+
+::: {.incremental}
+- **No-code** — point, click, ship a phone agent in an afternoon
+- **API / SaaS** — call a vendor's SDK, you wire the prompt and the data
+- **Libraries** — open weights, your laptop, your stack
+:::
+
+[Same problem, three different commitment levels. Pick where you want to live.]{.fragment .muted}
+
+::: notes
+Frame the rest of the section. Each rung trades control for speed.
+:::
+
+## No-code: Synthflow {.smaller}
+
+[Drag-drop, industry templates, fastest signup → live call]{.muted}
+
+- Pure no-code: visual builder, 20+ pre-built templates (HVAC, dental, real estate)
+- 65M+ total calls handled to date · Salesforce AppExchange integration
+- [synthflow.ai](https://synthflow.ai)
+
+<!-- TODO: assets/audio/synthflow.mp3 -->
+<!-- <audio controls src="assets/audio/synthflow.mp3"></audio> -->
+
+::: notes
+Open with this — most accessible, lowest friction. Audience: "wait, that's it?"
+:::
+
+## No-code: Bland AI — *Norm* {.smaller}
+
+[Single prompt → live agent in minutes (Mar 2026 launch)]{.muted}
+
+- Hybrid: no-code Conversational Pathways **or** prompt-only with Norm
+- 250+ enterprise customers, HIPAA-ready
+- [bland.ai](https://www.bland.ai)
+
+<!-- <audio controls src="assets/audio/bland.mp3"></audio> -->
+
+::: notes
+The "AI-native workflow" moment. Compare to Synthflow's UI builder — same outcome, very different ergonomics.
+:::
+
+## No-code: Vapi {.smaller}
+
+[The bridge: visual builder *and* full API]{.muted}
+
+- Flow Studio (drag-drop) + REST API · pick any LLM (GPT, Claude, Gemini) + any TTS
+- 100+ languages · scales early-stage to Fortune 500
+- [vapi.ai](https://vapi.ai)
+
+<!-- <audio controls src="assets/audio/vapi.mp3"></audio> -->
+
+::: notes
+Use this to bridge into the API tier. "Same platform, different door." Good moment to ask "show of hands — who'd rather click than code?"
+:::
+
+## No-code: ElevenLabs Agents {.smaller}
+
+[The voice quality benchmark]{.muted}
+
+- 1000+ voices · git-style branching for agent versions · MCP integrations for actions
+- $11B valuation · $330M ARR · $500M Series D (Sequoia, early 2026)
+- [elevenlabs.io/agents](https://elevenlabs.io/agents)
+
+<!-- <audio controls src="assets/audio/elevenlabs.mp3"></audio> -->
+
+::: notes
+This is where you play the audio sample and let it land. "That is not a human." Nobody believes you.
+:::
+
+## No-code: honorable mentions {.smaller}
+
+- **Retell AI** — $0.07/min, 600ms latency, no base fee
+- **Voiceflow** — one canvas for chat AND voice
+- **Lindy** — $49–$199/mo, CRM-native
+- **Ringg AI** — $0.06/min all-in, 10k concurrent
+
+[Market context: $2.1B VC funding in 2025 · projected $18B (2025) → $61B (2031)]{.muted .footer}
+
+::: notes
+Speed-run these in 30 seconds. The point is breadth — there are too many to demo.
+:::
+
+## API / SaaS: realtime APIs {.smaller}
+
+| Provider | Pitch | Why it matters |
+|---|---|---|
+| **OpenAI Realtime** | gpt-realtime, 300-500ms | Default reference everyone knows |
+| **Google Gemini Live** | 24 langs + vision, barge-in | Multimodal future |
+| **Ultravox** | Speech-native, OSS foundation | Credible challenger |
+| **Hume EVI 3** | Sub-200ms + emotion modeling | Segue to the Sesame paper |
+
+::: notes
+This is the "if you're a developer, this is your default tier" segment. Most of what people deploy in 2026 lives here.
+:::
+
+## API / SaaS: best-in-class TTS {.smaller}
+
+[Each plays the same canned phrase]{.muted}
+
+- **Cartesia Sonic-3** — 30ms latency, laughter synthesis
+  <!-- <audio controls src="assets/audio/cartesia.mp3"></audio> -->
+- **ElevenLabs** — market standard, instant + pro cloning
+  <!-- <audio controls src="assets/audio/elevenlabs-api.mp3"></audio> -->
+
+::: notes
+Play them back-to-back. Audience hears latency-vs-quality tradeoff in one slide.
+:::
+
+## API / SaaS: best-in-class STT {.smaller}
+
+- **Deepgram Nova-3** — $0.0077/min streaming, per-second billing
+- **Soniox v4** *(Feb 5, 2026)* — 60+ langs, **in-stream translation**, 5hr streams
+
+[STT is solved enough that price and feature breadth win. Soniox v4's in-stream translation is the surprise of 2026 so far.]{.muted}
+
+::: notes
+Don't dwell — STT is the boring part. Quick mention then move on.
+:::
+
+# Demo: Sesame Phone App {.section-title background-color="#3c3836"}
+
+## Live call (closed beta) {.smaller}
+
+[I'm in the closed beta. Let's just call it.]{.muted}
+
+- Speakerphone in front of the room mic
+- Backup: pre-recorded sample if the call flakes
+- What to listen for: turn-taking, prosody, the *uncanny* moments
+
+::: notes
+Set expectations before dialing. Tell them: "If you've used a voice assistant in the last 5 years, you'll notice this is different. I want you to spot the moment where it stops feeling robotic."
+
+If the call drops or the network is bad, switch to assets/audio/sesame-backup.mp3 (record day-of).
+:::
+
+# Demo: `voice/` CLI {.section-title background-color="#3c3836"}
+
+## The repo is public — clone along {.smaller}
+
+```bash
+git clone https://github.com/Sinjhin/2026-post-project-voice-talk
+cd 2026-post-project-voice-talk
+uv sync
+uv run voice
+```
+
+::: {.fragment}
+**Four demos**, all keyboard-driven (↑↓ to select, ⏎ to launch, Esc to return):
+
+1. Local pipeline — Pipecat + Moonshine v2 + Kokoro
+2. Moshi — end-to-end speech-native (Kyutai)
+3. API comparison — OpenAI Realtime vs. local
+4. Emotion demo — Hume EVI 3 (Fish Speech S2 needs a paid commercial license, so it's research-only here)
+:::
+
+::: notes
+Repo URL aloud — give them 30 seconds to start the clone. The local pipeline is your hero demo: 100% Apache 2.0 / permissive, runs on a laptop, no cloud calls.
+:::
+
+## Demo placeholder — TUI screenshot here { .smaller }
+
+<!-- TODO: assets/img/voice-cli-tui.png — terminal screenshot of the menu -->
+
+[Screenshot of the Rich TUI menu goes here once the CLI is built.]{.muted}
+
+::: notes
+Show the TUI, then launch demo 1. Talk through what's happening as it runs. Esc back. Launch demo 2. Repeat.
+:::
+
+# The Paper {.section-title background-color="#3c3836"}
+
+## *Crossing the Uncanny Valley of Conversational Voice*
+
+[Sesame AI Labs · Feb 27, 2025]{.muted}
+
+> Voice assistants fail because they lack emotional intelligence and conversational dynamics.
+
+[CSM (Conversational Speech Model) aims to cross the valley. [@sesame2025csm]]{.fragment}
+
+::: notes
+State the thesis plainly. The paper is refreshingly honest — they tell you exactly where they fall short.
+:::
+
+## The architecture {.smaller}
+
+- **Split-stage transformer**:
+  - Large multimodal *backbone* — predicts zeroth RVQ codebook level from interleaved text + audio tokens
+  - Smaller *audio decoder* — reconstructs remaining codebook levels
+- Built on Llama variants · Mimi tokenizer · 1B / 3B / 8B sizes
+- Trained on ~1M hours English audio
+- **Compute amortization**: decoder trains on 1/16 of frames — big memory win
+
+::: notes
+The clever bit is the compute amortization. You don't need every frame to teach the decoder; sampling 1/16 is enough. That's how they scaled.
+
+If audience is mixed, gloss over RVQ — say "discrete audio tokens" and move on.
+:::
+
+## The honest results {.smaller}
+
+- Traditional metrics (WER, speaker similarity): **saturated** — matches humans
+- New benchmarks they introduce:
+  - Homograph disambiguation (`lead` the metal vs. `lead` the verb)
+  - Pronunciation consistency across multi-turn
+
+. . .
+
+- **CMOS without context**: tied with humans
+- **CMOS with 90s of context**: humans clearly preferred [.accent-orange]{.fragment}
+
+::: notes
+This is the punchline. They beat humans when you don't give the model context. The moment you give it a real conversation to continue, it loses. That's the gap.
+:::
+
+## Discussion prompts {.smaller}
+
+::: {.incremental}
+1. Are we **out of useful TTS metrics**? What replaces WER and CMOS?
+2. What's the missing ingredient when **context matters**?
+3. Should they integrate **pre-trained LLM weights**, or stay clean?
+4. **Multilingual gap** — current model is English-only
+5. **Full-duplex turn-taking** — TTS limitation, or engineering problem?
+:::
+
+::: notes
+Throw these out one at a time. Let the room argue. The third one (LLM weights) is the most contentious — they explicitly chose not to inherit from a pretrained LM, and that's defensible *and* questionable.
+:::
+
+# Wrap
+
+## Thanks · Q&A {.smaller}
+
+- Repo: [github.com/Sinjhin/2026-post-project-voice-talk](https://github.com/Sinjhin/2026-post-project-voice-talk)
+- Paper: [sesame.com/research/crossing_the_uncanny_valley_of_voice](https://www.sesame.com/research/crossing_the_uncanny_valley_of_voice)
+- Code (CSM): [github.com/SesameAILabs/csm](https://github.com/SesameAILabs/csm)
+
+[Find me — John Gardner · [Sinjhin](https://github.com/Sinjhin) on GitHub]{.muted}
+
+::: notes
+Take 2 questions then break. The audio comparison slides usually drive the most Q&A.
+:::

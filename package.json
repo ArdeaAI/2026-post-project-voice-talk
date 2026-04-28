@@ -1,7 +1,12 @@
 {
   "name": "2026-post-project-voice-talk",
-  "module": "index.ts",
   "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "quarto preview slides.qmd",
+    "render": "quarto render slides.qmd",
+    "publish": "quarto publish gh-pages slides.qmd"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },

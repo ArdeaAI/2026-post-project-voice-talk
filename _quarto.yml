@@ -1,0 +1,30 @@
+project:
+  type: default
+
+format:
+  revealjs:
+    theme: [dark, gruvbox.scss]
+    highlight-style: gruvbox-dark
+    slide-number: c/t
+    show-slide-number: speaker
+    controls: true
+    progress: true
+    history: true
+    transition: fade
+    transition-speed: fast
+    incremental: false
+    center: false
+    overview: true
+    chalkboard: false
+    menu: false
+    hash-type: number
+    embed-resources: false
+    code-line-numbers: false
+    width: 1280
+    height: 720
+    margin: 0.08
+    mermaid:
+      theme: dark
+    bibliography: references.bib
+
+engine: jupyter

@@ -3,6 +3,7 @@
 # INTERNAL
 # ==================================================================
 ai/
+.claude/
 
 
 # ==================================================================
@@ -88,3 +89,9 @@ next-env.d.ts
 .owncloud
 .owncloudsync.log
 .sync_*
+
+/.quarto/
+**/*.quarto_ipynb
+# Quarto build output (rendered deck) — published to gh-pages branch via `bun run publish`
+/slides.html
+/slides_files/

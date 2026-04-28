@@ -1,0 +1,145 @@
+/*-- scss:defaults --*/
+
+// Gruvbox Dark palette
+$gruv-bg0:        #282828;
+$gruv-bg1:        #3c3836;
+$gruv-bg2:        #504945;
+$gruv-bg3:        #665c54;
+$gruv-fg0:        #fbf1c7;
+$gruv-fg1:        #ebdbb2;
+$gruv-fg2:        #d5c4a1;
+$gruv-fg3:        #bdae93;
+$gruv-fg4:        #a89984;
+$gruv-gray:       #928374;
+$gruv-red:        #fb4934;
+$gruv-green:      #b8bb26;
+$gruv-yellow:     #fabd2f;
+$gruv-blue:       #83a598;
+$gruv-purple:     #d3869b;
+$gruv-aqua:       #8ec07c;
+$gruv-orange:     #fe8019;
+
+// Reveal.js / Quarto theme variables
+$body-bg:                    $gruv-bg0;
+$body-color:                 $gruv-fg1;
+$presentation-heading-color: $gruv-yellow;
+$presentation-heading-font:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$presentation-font-family:   'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$presentation-font-size-root: 36px;
+$link-color:                 $gruv-blue;
+$link-color-hover:           $gruv-aqua;
+$selection-bg:               $gruv-orange;
+$selection-color:            $gruv-bg0;
+$code-color:                 $gruv-green;
+$code-bg:                    $gruv-bg1;
+$code-block-bg:              $gruv-bg1;
+$code-block-border-color:    $gruv-bg2;
+
+/*-- scss:rules --*/
+
+.reveal {
+  background-color: $gruv-bg0;
+  color: $gruv-fg1;
+}
+
+.reveal .slides section {
+  text-align: left;
+}
+
+.reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+  color: $gruv-yellow;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.reveal h1 { color: $gruv-orange; }
+
+.reveal a {
+  color: $gruv-blue;
+  text-decoration: none;
+  border-bottom: 1px dotted $gruv-blue;
+}
+.reveal a:hover {
+  color: $gruv-aqua;
+  border-bottom-color: $gruv-aqua;
+}
+
+.reveal code {
+  color: $gruv-green;
+  background: $gruv-bg1;
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+
+.reveal pre {
+  background: $gruv-bg1;
+  border: 1px solid $gruv-bg2;
+  border-radius: 6px;
+  box-shadow: none;
+}
+
+.reveal pre code {
+  background: transparent;
+  padding: 1em;
+}
+
+.reveal blockquote {
+  background: $gruv-bg1;
+  border-left: 4px solid $gruv-orange;
+  color: $gruv-fg2;
+  padding: 0.5em 1em;
+}
+
+.reveal table {
+  border-collapse: collapse;
+}
+.reveal table th {
+  color: $gruv-yellow;
+  border-bottom: 2px solid $gruv-bg2;
+}
+.reveal table td {
+  border-bottom: 1px solid $gruv-bg1;
+}
+
+.reveal .slide-number {
+  color: $gruv-gray;
+  background: transparent;
+}
+
+.reveal .progress {
+  color: $gruv-orange;
+}
+
+.reveal .controls {
+  color: $gruv-fg4;
+}
+
+// Section divider slides — center, uppercase, big
+.reveal section.section-title h1,
+.reveal section[data-state="section"] h1 {
+  font-size: 2.5em;
+  text-align: center;
+  color: $gruv-orange;
+}
+
+// Audio sample blocks on landscape slides
+.reveal audio {
+  width: 100%;
+  max-width: 480px;
+  margin-top: 0.5em;
+  filter: invert(0.9) hue-rotate(180deg);
+}
+
+// Speaker emphasis
+.reveal .accent-orange { color: $gruv-orange; }
+.reveal .accent-yellow { color: $gruv-yellow; }
+.reveal .accent-green  { color: $gruv-green; }
+.reveal .accent-blue   { color: $gruv-blue; }
+.reveal .accent-red    { color: $gruv-red; }
+.reveal .muted         { color: $gruv-gray; }
+
+.reveal .footer {
+  color: $gruv-gray;
+  font-size: 0.6em;
+}
